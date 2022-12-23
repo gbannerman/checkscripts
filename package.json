@@ -1,0 +1,33 @@
+{
+  "name": "checkscript",
+  "version": "1.0.0",
+  "description": "Inspired by Dan Slimmon's concept of \"Do Nothing scripts\", this project facilitates incremental automation of repetitive tasks",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx ts-node-esm ./src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc"
+  },
+  "keywords": [
+    "do",
+    "nothing",
+    "dan",
+    "slimmon",
+    "incremental",
+    "automation",
+    "toil",
+    "checkscript"
+  ],
+  "author": "Gavin Bannerman",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.11.17",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "log-update": "^5.0.1"
+  }
+}
