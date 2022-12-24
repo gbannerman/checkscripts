@@ -8,39 +8,51 @@ import {
   withWaitForSpacebarPressed,
 } from "./output.js";
 
-export function checkscript(name: string, description: string) {
-  return new Checkscript(name, description);
+export function checkscript<Context extends {}>(
+  name: string,
+  description: string,
+  context: Context
+) {
+  return new Checkscript<Context>(name, description, context);
 }
 
-type CheckscriptStep = (stepNumber: number) => Promise<void>;
+type CheckscriptStep<Context> = (
+  context: Context,
+  stepNumber: number
+) => Promise<void>;
 
-type CheckscriptStepAction =
+type CheckscriptStepAction<Context> =
   | ManualCheckscriptStepAction
-  | AutomatedCheckscriptStepAction;
+  | AutomatedCheckscriptStepAction<Context>;
 
-class Checkscript {
-  private _steps: CheckscriptStep[];
+class Checkscript<Context extends {}> {
+  private _steps: CheckscriptStep<Context>[];
   private name: string;
   private description: string;
+  private context: Context;
 
-  constructor(name: string, description: string) {
+  constructor(name: string, description: string, context: Context) {
     this._steps = [];
     this.name = name;
     this.description = description;
+    this.context = context;
   }
 
-  steps = function (this: Checkscript, ...steps: CheckscriptStep[]) {
+  steps = function (
+    this: Checkscript<Context>,
+    ...steps: CheckscriptStep<Context>[]
+  ) {
     this._steps = [...this._steps, ...steps];
     return this;
   };
 
-  run = async function (this: Checkscript) {
+  run = async function (this: Checkscript<Context>) {
     console.log(checkscriptName(this.name));
     console.log(checkscriptDescription(this.description));
 
-    for (let stepNumber = 1; stepNumber < this._steps.length; stepNumber++) {
+    for (let stepNumber = 1; stepNumber <= this._steps.length; stepNumber++) {
       const step = this._steps[stepNumber - 1];
-      await step(stepNumber);
+      await step(this.context, stepNumber);
     }
 
     console.log(checkscriptComplete(this.name));
@@ -48,30 +60,38 @@ class Checkscript {
   };
 }
 
-export function step(name: string, action: CheckscriptStepAction) {
+export function step<Context>(
+  name: string,
+  action: CheckscriptStepAction<Context>
+) {
   const stepHandler = getStepHandler(action);
 
-  return async function (stepNumber: number) {
-    await stepHandler(stepTitle(stepNumber, name));
+  return async function (context: Context, stepNumber: number) {
+    await stepHandler(context, stepTitle(stepNumber, name));
   };
 }
 
-function getStepHandler(action: CheckscriptStepAction) {
+function getStepHandler<Context>(action: CheckscriptStepAction<Context>) {
   switch (typeof action) {
     case "string":
-      return (stepTitle: string) => manualStep(stepTitle, action);
+      return (_context: Context, stepTitle: string) =>
+        manualStep(stepTitle, action);
     case "function":
-      return (stepTitle: string) => automatedStep(stepTitle, action);
+      return (context: Context, stepTitle: string) =>
+        automatedStep(context, stepTitle, action);
   }
 }
 
-type AutomatedCheckscriptStepAction = () => Promise<string | void>;
+type AutomatedCheckscriptStepAction<Context> = (
+  context: Context
+) => Promise<string | void>;
 
-async function automatedStep(
+async function automatedStep<Context>(
+  context: Context,
   stepTitle: string,
-  action: AutomatedCheckscriptStepAction
+  action: AutomatedCheckscriptStepAction<Context>
 ) {
-  const text = await withLoadingSpinner(stepTitle, () => action());
+  const text = await withLoadingSpinner(stepTitle, () => action(context));
 
   logUpdate(
     `
