@@ -8,7 +8,7 @@ checkscript(
   "GitHub Action Migration",
   "A script to assist in the migration of a project to GitHub Actions"
 )
-  .steps([
+  .steps(
     step(
       "Checkout the git repository",
       "Run git clone git@github.com:administrate/{REPO_NAME}.git in your terminal"
@@ -18,14 +18,14 @@ checkscript(
       await timeout(3000);
       return "Hello";
     }),
-    step("End thing", "One more"),
-  ])
-  .steps([
+    step("End thing", "One more")
+  )
+  .steps(
     step(
       "Checkout the git repository",
       "Run git clone git@github.com:administrate/{REPO_NAME}.git in your terminal"
     ),
     step("Do another thing", "Do this thing"),
-    step("End thing", "One more"),
-  ])
+    step("End thing", "One more")
+  )
   .run();

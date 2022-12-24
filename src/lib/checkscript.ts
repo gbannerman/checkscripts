@@ -1,15 +1,25 @@
-// export type Checkscript<T> = (name: string, handler: Function) => T;
-import chalk from "chalk";
 import logUpdate from "log-update";
-
-const LOADING_FRAMES = ["-", "\\", "|", "/"];
+import {
+  checkscriptName,
+  checkscriptDescription,
+  checkscriptComplete,
+  stepTitle,
+  withLoadingSpinner,
+  withWaitForSpacebarPressed,
+} from "./output.js";
 
 export function checkscript(name: string, description: string) {
   return new Checkscript(name, description);
 }
 
+type CheckscriptStep = (stepNumber: number) => Promise<void>;
+
+type CheckscriptStepAction =
+  | ManualCheckscriptStepAction
+  | AutomatedCheckscriptStepAction;
+
 class Checkscript {
-  private _steps: any[];
+  private _steps: CheckscriptStep[];
   private name: string;
   private description: string;
 
@@ -19,83 +29,78 @@ class Checkscript {
     this.description = description;
   }
 
-  steps = function (this: Checkscript, steps: any[]) {
+  steps = function (this: Checkscript, ...steps: CheckscriptStep[]) {
     this._steps = [...this._steps, ...steps];
     return this;
   };
 
   run = async function (this: Checkscript) {
-    console.log(
-      `---------------------------\n${chalk.bold(
-        this.name
-      )}\n---------------------------`
-    );
-    console.log(`${this.description}\n`);
+    console.log(checkscriptName(this.name));
+    console.log(checkscriptDescription(this.description));
 
     for (let stepNumber = 1; stepNumber < this._steps.length; stepNumber++) {
       const step = this._steps[stepNumber - 1];
       await step(stepNumber);
     }
 
-    console.log(`✅ Complete: ${chalk.bold(this.name)}`);
+    console.log(checkscriptComplete(this.name));
     process.exit();
   };
 }
 
-export function step(name: string, action: string | Function) {
-  const stepAction = getActionHandler(action);
+export function step(name: string, action: CheckscriptStepAction) {
+  const stepHandler = getStepHandler(action);
+
   return async function (stepNumber: number) {
-    const stepTitle = chalk.bold(`${stepNumber}. ${name}`);
-    await stepAction(stepTitle, action as any);
+    await stepHandler(stepTitle(stepNumber, name));
   };
 }
 
-function getActionHandler(action: string | Function) {
+function getStepHandler(action: CheckscriptStepAction) {
   switch (typeof action) {
     case "string":
-      return manualStep;
+      return (stepTitle: string) => manualStep(stepTitle, action);
     case "function":
-      return automatedStep;
+      return (stepTitle: string) => automatedStep(stepTitle, action);
   }
 }
 
-async function automatedStep(stepTitle: string, action: Function) {
-  logUpdate(`${stepTitle}\n`);
-  let index = 0;
-  const interval = setInterval(() => {
-    const frame = LOADING_FRAMES[(index = ++index % LOADING_FRAMES.length)];
-    logUpdate(`${frame} ${stepTitle}`);
-  }, 80);
-  const text = await action();
-  clearInterval(interval);
-  logUpdate(`✓ ${stepTitle}\n${text ?? ""}\n`);
-  logUpdate.done();
-}
+type AutomatedCheckscriptStepAction = () => Promise<string | void>;
 
-async function manualStep(stepTitle: string, action: string) {
+async function automatedStep(
+  stepTitle: string,
+  action: AutomatedCheckscriptStepAction
+) {
+  const text = await withLoadingSpinner(stepTitle, () => action());
+
   logUpdate(
-    `➤ ${stepTitle}\n`,
-    `${action}\n`,
-    chalk.dim("PRESS SPACEBAR TO CONTINUE")
+    `
+✓ ${stepTitle}
+${text ?? ""}
+`
   );
-
-  await keypress();
-
-  logUpdate(`✓ ${stepTitle}\n`, `${action}\n`);
 
   logUpdate.done();
 }
 
-const keypress = async () => {
-  process.stdin.setRawMode(true);
-  return new Promise<void>((resolve) =>
-    process.stdin.on("data", (data) => {
-      const shouldContinue = data.toString("hex") === "20";
-      if (shouldContinue) {
-        process.stdin.setRawMode(false);
-        process.stdin.removeAllListeners("data");
-        resolve();
-      }
-    })
+type ManualCheckscriptStepAction = string;
+
+async function manualStep(
+  stepTitle: string,
+  action: ManualCheckscriptStepAction
+) {
+  await withWaitForSpacebarPressed(
+    `
+➤ ${stepTitle}
+${action}`
   );
-};
+
+  logUpdate(
+    `
+✓ ${stepTitle}
+${action}
+    `
+  );
+
+  logUpdate.done();
+}
