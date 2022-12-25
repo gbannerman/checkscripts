@@ -1,14 +1,9 @@
-import logUpdate from "log-update";
+import { useFormat } from "./output.js";
 import {
-  useOutput,
-  withLoadingSpinner,
-  withWaitForSpacebarPressed,
-} from "./output.js";
-
-enum CheckscriptStepType {
-  MANUAL,
-  AUTOMATED,
-}
+  CheckscriptStep,
+  getDocumentStepHandler,
+  getRunStepHandler,
+} from "./step.js";
 
 export enum CheckscriptMode {
   RUN,
@@ -23,19 +18,11 @@ export function checkscript<Context extends {}>(
   return new Checkscript<Context>(name, description, context);
 }
 
-export interface CheckscriptStep<Context> {
-  name: string;
-  type: CheckscriptStepType;
-  action: CheckscriptStepAction<Context>;
-}
+export { step } from "./step.js";
 
-export interface DocumentCheckscriptOptions {
+interface DocumentCheckscriptOptions {
   includeFooter: boolean;
 }
-
-type CheckscriptStepAction<Context> =
-  | ManualCheckscriptStepAction
-  | AutomatedCheckscriptStepAction<Context>;
 
 class Checkscript<Context extends {}> {
   private _steps: CheckscriptStep<Context>[];
@@ -58,11 +45,23 @@ class Checkscript<Context extends {}> {
     return this;
   };
 
-  private _run = async function (
+  run = async function (this: Checkscript<Context>) {
+    this._runCheckscript(CheckscriptMode.RUN, true);
+  };
+
+  document = async function (
     this: Checkscript<Context>,
-    mode: CheckscriptMode
+    options: DocumentCheckscriptOptions = { includeFooter: true }
   ) {
-    const { name, description, stepTitle, footer } = useOutput(mode);
+    this._runCheckscript(CheckscriptMode.DOCUMENT, options.includeFooter);
+  };
+
+  private _runCheckscript = async function (
+    this: Checkscript<Context>,
+    mode: CheckscriptMode,
+    includeFooter: boolean
+  ) {
+    const { name, description, stepTitle, footer } = useFormat(mode);
 
     console.log(name(this.name));
     console.log(description(this.description));
@@ -78,109 +77,10 @@ class Checkscript<Context extends {}> {
       await stepHandler(this.context, stepTitle(stepNumber, step.name));
     }
 
-    console.log(footer(this.name));
+    if (includeFooter) {
+      console.log(footer(this.name));
+    }
 
     process.exit();
   };
-
-  run = async function (this: Checkscript<Context>) {
-    this._run(CheckscriptMode.RUN);
-  };
-
-  document = async function (this: Checkscript<Context>) {
-    this._run(CheckscriptMode.DOCUMENT);
-  };
-}
-
-export function step<Context>(
-  name: string,
-  action: CheckscriptStepAction<Context>
-) {
-  const type = getStepType(action);
-
-  return {
-    name,
-    type,
-    action,
-  };
-}
-
-function getDocumentStepHandler<Context>(
-  action: CheckscriptStepAction<Context>
-) {
-  switch (typeof action) {
-    case "string":
-      return async (_context: Context, stepTitle: string) => {
-        console.log(`\n## ${stepTitle}`);
-        console.log(action);
-      };
-    case "function":
-      return async (_context: Context, stepTitle: string) => {
-        console.log(`\n## ${stepTitle}`);
-        console.log("*[THIS IS AN AUTOMATED STEP]*");
-      };
-  }
-}
-
-function getRunStepHandler<Context>(action: CheckscriptStepAction<Context>) {
-  switch (typeof action) {
-    case "string":
-      return (_context: Context, stepTitle: string) =>
-        manualStep(stepTitle, action);
-    case "function":
-      return (context: Context, stepTitle: string) =>
-        automatedStep(context, stepTitle, action);
-  }
-}
-
-function getStepType<Context>(action: CheckscriptStepAction<Context>) {
-  switch (typeof action) {
-    case "string":
-      return CheckscriptStepType.MANUAL;
-    case "function":
-      return CheckscriptStepType.AUTOMATED;
-  }
-}
-
-type AutomatedCheckscriptStepAction<Context> = (
-  context: Context
-) => Promise<string | void>;
-
-async function automatedStep<Context>(
-  context: Context,
-  stepTitle: string,
-  action: AutomatedCheckscriptStepAction<Context>
-) {
-  const text = await withLoadingSpinner(stepTitle, () => action(context));
-
-  logUpdate(
-    `
-✓ ${stepTitle}
-${text ?? ""}
-`
-  );
-
-  logUpdate.done();
-}
-
-type ManualCheckscriptStepAction = string;
-
-async function manualStep(
-  stepTitle: string,
-  action: ManualCheckscriptStepAction
-) {
-  await withWaitForSpacebarPressed(
-    `
-➤ ${stepTitle}
-${action}`
-  );
-
-  logUpdate(
-    `
-✓ ${stepTitle}
-${action}
-    `
-  );
-
-  logUpdate.done();
 }

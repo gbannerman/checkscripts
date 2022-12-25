@@ -5,7 +5,7 @@ import { waitForInput } from "./input.js";
 
 const LOADING_FRAMES = ["-", "\\", "|", "/"];
 
-export function useOutput(mode: CheckscriptMode) {
+export function useFormat(mode: CheckscriptMode) {
   return mode === CheckscriptMode.DOCUMENT
     ? {
         name: (name: string) => `# ${name}`,

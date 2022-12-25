@@ -39,4 +39,4 @@ checkscript<TestContext>(
       return `From previous step: ${context.fakeResult}`;
     })
   )
-  .run();
+  .document();
