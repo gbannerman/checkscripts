@@ -1,26 +1,34 @@
 import chalk from "chalk";
 import logUpdate from "log-update";
+import { CheckscriptMode } from "./checkscript.js";
 import { waitForInput } from "./input.js";
 
 const LOADING_FRAMES = ["-", "\\", "|", "/"];
 
-export function checkscriptName(name: string) {
-  const dividerLength = name.length + 6;
-  return `${"-".repeat(dividerLength)}\n   ${chalk.bold(name)}\n${"-".repeat(
-    dividerLength
-  )}`;
-}
-
-export function checkscriptDescription(description: string) {
-  return `${chalk.italic(description)}\n`;
-}
-
-export function checkscriptComplete(name: string) {
-  return `\n✅ Complete: ${chalk.bold(name)}`;
-}
-
-export function stepTitle(stepNumber: number, name: string) {
-  return chalk.bold(`${stepNumber}. ${name}`);
+export function useOutput(mode: CheckscriptMode) {
+  return mode === CheckscriptMode.DOCUMENT
+    ? {
+        name: (name: string) => `# ${name}`,
+        description: (description: string) => `*${description}*`,
+        stepTitle: (stepNumber: number, name: string) =>
+          `${stepNumber}. ${name}`,
+        footer: () => `
+---
+*This document is a [checkscript](). It can be run using JavaScript.*
+            `,
+      }
+    : {
+        name: (name: string) => {
+          const dividerLength = name.length + 6;
+          return `${"-".repeat(dividerLength)}\n   ${chalk.bold(
+            name
+          )}\n${"-".repeat(dividerLength)}`;
+        },
+        description: (description: string) => `${chalk.italic(description)}\n`,
+        stepTitle: (stepNumber: number, name: string) =>
+          chalk.bold(`${stepNumber}. ${name}`),
+        footer: (name: string) => `\n✅ Complete: ${chalk.bold(name)}`,
+      };
 }
 
 export async function withLoadingSpinner<T>(

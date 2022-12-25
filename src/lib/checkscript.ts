@@ -1,12 +1,19 @@
 import logUpdate from "log-update";
 import {
-  checkscriptName,
-  checkscriptDescription,
-  checkscriptComplete,
-  stepTitle,
+  useOutput,
   withLoadingSpinner,
   withWaitForSpacebarPressed,
 } from "./output.js";
+
+enum CheckscriptStepType {
+  MANUAL,
+  AUTOMATED,
+}
+
+export enum CheckscriptMode {
+  RUN,
+  DOCUMENT,
+}
 
 export function checkscript<Context extends {}>(
   name: string,
@@ -16,10 +23,15 @@ export function checkscript<Context extends {}>(
   return new Checkscript<Context>(name, description, context);
 }
 
-type CheckscriptStep<Context> = (
-  context: Context,
-  stepNumber: number
-) => Promise<void>;
+export interface CheckscriptStep<Context> {
+  name: string;
+  type: CheckscriptStepType;
+  action: CheckscriptStepAction<Context>;
+}
+
+export interface DocumentCheckscriptOptions {
+  includeFooter: boolean;
+}
 
 type CheckscriptStepAction<Context> =
   | ManualCheckscriptStepAction
@@ -46,17 +58,37 @@ class Checkscript<Context extends {}> {
     return this;
   };
 
-  run = async function (this: Checkscript<Context>) {
-    console.log(checkscriptName(this.name));
-    console.log(checkscriptDescription(this.description));
+  private _run = async function (
+    this: Checkscript<Context>,
+    mode: CheckscriptMode
+  ) {
+    const { name, description, stepTitle, footer } = useOutput(mode);
+
+    console.log(name(this.name));
+    console.log(description(this.description));
 
     for (let stepNumber = 1; stepNumber <= this._steps.length; stepNumber++) {
       const step = this._steps[stepNumber - 1];
-      await step(this.context, stepNumber);
+      const getStepHandler =
+        mode === CheckscriptMode.DOCUMENT
+          ? getDocumentStepHandler
+          : getRunStepHandler;
+
+      const stepHandler = getStepHandler(step.action);
+      await stepHandler(this.context, stepTitle(stepNumber, step.name));
     }
 
-    console.log(checkscriptComplete(this.name));
+    console.log(footer(this.name));
+
     process.exit();
+  };
+
+  run = async function (this: Checkscript<Context>) {
+    this._run(CheckscriptMode.RUN);
+  };
+
+  document = async function (this: Checkscript<Context>) {
+    this._run(CheckscriptMode.DOCUMENT);
   };
 }
 
@@ -64,14 +96,33 @@ export function step<Context>(
   name: string,
   action: CheckscriptStepAction<Context>
 ) {
-  const stepHandler = getStepHandler(action);
+  const type = getStepType(action);
 
-  return async function (context: Context, stepNumber: number) {
-    await stepHandler(context, stepTitle(stepNumber, name));
+  return {
+    name,
+    type,
+    action,
   };
 }
 
-function getStepHandler<Context>(action: CheckscriptStepAction<Context>) {
+function getDocumentStepHandler<Context>(
+  action: CheckscriptStepAction<Context>
+) {
+  switch (typeof action) {
+    case "string":
+      return async (_context: Context, stepTitle: string) => {
+        console.log(`\n## ${stepTitle}`);
+        console.log(action);
+      };
+    case "function":
+      return async (_context: Context, stepTitle: string) => {
+        console.log(`\n## ${stepTitle}`);
+        console.log("*[THIS IS AN AUTOMATED STEP]*");
+      };
+  }
+}
+
+function getRunStepHandler<Context>(action: CheckscriptStepAction<Context>) {
   switch (typeof action) {
     case "string":
       return (_context: Context, stepTitle: string) =>
@@ -79,6 +130,15 @@ function getStepHandler<Context>(action: CheckscriptStepAction<Context>) {
     case "function":
       return (context: Context, stepTitle: string) =>
         automatedStep(context, stepTitle, action);
+  }
+}
+
+function getStepType<Context>(action: CheckscriptStepAction<Context>) {
+  switch (typeof action) {
+    case "string":
+      return CheckscriptStepType.MANUAL;
+    case "function":
+      return CheckscriptStepType.AUTOMATED;
   }
 }
 
