@@ -10,10 +10,10 @@ export enum CheckscriptMode {
   DOCUMENT,
 }
 
-export function checkscript<Context extends {}>(
+export function checkscript<Context extends Object = {}>(
   name: string,
   description: string,
-  context: Context
+  context: Context = {} as Context
 ) {
   return new Checkscript<Context>(name, description, context);
 }
@@ -24,7 +24,7 @@ interface DocumentCheckscriptOptions {
   includeFooter: boolean;
 }
 
-class Checkscript<Context extends {}> {
+class Checkscript<Context extends Object> {
   private _steps: CheckscriptStep<Context>[];
   private name: string;
   private description: string;

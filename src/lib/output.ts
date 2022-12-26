@@ -33,7 +33,7 @@ export function useFormat(mode: CheckscriptMode) {
 
 export async function withLoadingSpinner<T>(
   text: string,
-  operation: () => Promise<T>
+  operation: () => Promise<T> | T
 ) {
   let index = 0;
   const interval = setInterval(() => {

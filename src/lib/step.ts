@@ -70,7 +70,7 @@ function getStepType<Context>(action: CheckscriptStepAction<Context>) {
 
 type AutomatedCheckscriptStepAction<Context> = (
   context: Context
-) => Promise<string | void>;
+) => string | void | Promise<string | void>;
 
 async function automatedStep<Context>(
   context: Context,
