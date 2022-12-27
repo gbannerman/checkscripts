@@ -14,7 +14,9 @@ Install `checkscripts` as an npm module:
 npm install -s checkscripts
 ```
 
-## Example
+## Examples
+
+### Running a Checkscript
 
 ```TypeScript
 import { checkscript, step } from "checkscripts";
@@ -82,3 +84,55 @@ checkscript<ExampleContext>(
 and when this is run:
 
 <p align="center"><img src="/img/automated-demo.gif?raw=true"/></p>
+
+### Documenting a Checkscript
+
+A checkscript can be output as markdown, by calling `document()` instead of `run()`. Demonstrated with the original example:
+
+```TypeScript
+import { checkscript, step } from "checkscripts";
+
+checkscript(
+  "Restore a database backup",
+  "This is our procedure for restoring a database backup."
+)
+  .steps(
+    step(
+      "Retrieve the backup file",
+      "Log in to the [storage control panel](https://example.com/storage/) and download the latest backup file."
+    ),
+    step(
+      "Load the backup data into the database",
+      "Run this command to load the backup data into the database: `psql < backup_YYYYMMDD.sql`."
+    ),
+    step(
+      "Check the restored data for consistency",
+      "Log in to the database and make sure there are recent records in the events table."
+    ),
+  )
+  .document();
+```
+
+The output will be:
+
+```markdown
+# Restore a database backup
+
+_This is our procedure for restoring a database backup._
+
+## 1. Retrieve the backup file
+
+Log in to the [storage control panel](https://example.com/storage/) and download the latest backup file.
+
+## 2. Load the backup data into the database
+
+Run this command to load the backup data into the database: `psql < backup_YYYYMMDD.sql`.
+
+## 3. Check the restored data for consistency
+
+Log in to the database and make sure there are recent records in the events table.
+
+---
+
+_This document is a [checkscript](https://github.com/gbannerman/checkscripts). It can be run using JavaScript._
+```
