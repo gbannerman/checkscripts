@@ -1,7 +1,7 @@
 {
-  "name": "checkscript",
+  "name": "checkscripts",
   "version": "1.0.0",
-  "description": "Inspired by Dan Slimmon's concept of \"Do Nothing scripts\", this project facilitates incremental automation of repetitive tasks",
+  "description": "Inspired by Dan Slimmon's concept of \"Do Nothing scripts\", this project facilitates incremental automation of repetitive tasks.",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "incremental",
     "automation",
     "toil",
-    "checkscript"
+    "checkscripts"
   ],
   "author": "Gavin Bannerman",
   "license": "ISC",
