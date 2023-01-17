@@ -1,9 +1,9 @@
-import { useFormat } from "./output.js";
+import { useFormat } from "./output";
 import {
   CheckscriptStep,
   getDocumentStepHandler,
   getRunStepHandler,
-} from "./step.js";
+} from "./step";
 
 export enum CheckscriptMode {
   RUN,
