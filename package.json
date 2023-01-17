@@ -1,6 +1,6 @@
 {
   "name": "checkscripts",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Inspired by Dan Slimmon's concept of \"Do Nothing scripts\", this project facilitates incremental automation of repetitive tasks.",
   "type": "module",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "start": "npx ts-node-esm ./src/index.ts",
     "test": "npx jest",
     "lint": "npx prettier --check 'src/**/*.ts'",
-    "build": "npx tsc"
+    "build": "rm -rf dist && tsc --declaration --outdir dist src/lib/index.ts"
   },
   "keywords": [
     "do",
@@ -21,6 +21,8 @@
     "checkscripts"
   ],
   "author": "Gavin Bannerman",
+  "repository": "github:gbannerman/checkscripts",
+  "homepage": "https://github.com/gbannerman/checkscripts",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.2.5",
