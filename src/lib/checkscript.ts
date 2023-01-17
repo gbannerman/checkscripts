@@ -18,7 +18,7 @@ export function checkscript<Context extends Object = {}>(
   return new Checkscript<Context>(name, description, context);
 }
 
-export { step } from "./step.js";
+export { step } from "./step";
 
 interface DocumentCheckscriptOptions {
   includeFooter: boolean;
