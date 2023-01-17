@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import { stdin as mockStdIn } from "mock-stdin";
-import { waitForInput } from "../lib/input.js";
+import { waitForInput } from "../lib/input";
 
 const KEYS = {
   ESCAPE: "\u001B",

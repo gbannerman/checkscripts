@@ -1,9 +1,9 @@
-import { useFormat } from "./output.js";
+import { useFormat } from "./output";
 import {
   CheckscriptStep,
   getDocumentStepHandler,
   getRunStepHandler,
-} from "./step.js";
+} from "./step";
 
 export enum CheckscriptMode {
   RUN,
@@ -18,7 +18,7 @@ export function checkscript<Context extends Object = {}>(
   return new Checkscript<Context>(name, description, context);
 }
 
-export { step } from "./step.js";
+export { step } from "./step";
 
 interface DocumentCheckscriptOptions {
   includeFooter: boolean;
