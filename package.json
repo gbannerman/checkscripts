@@ -4,6 +4,9 @@
   "description": "Inspired by Dan Slimmon's concept of \"Do Nothing scripts\", this project facilitates incremental automation of repetitive tasks.",
   "type": "module",
   "main": "index.js",
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
     "start": "npx ts-node-esm ./src/index.ts",
     "test": "npx jest",

@@ -10,4 +10,3 @@ jobs:
   ci:
     name: CI
     uses: ./.github/workflows/test.yml
-    secrets: inherit
