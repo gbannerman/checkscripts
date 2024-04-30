@@ -1,2 +1,2 @@
-export { checkscript } from "./checkscript";
-export { step } from "./step";
+export { checkscript } from "./checkscript.js";
+export { step } from "./step.js";

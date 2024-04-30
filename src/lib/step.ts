@@ -1,5 +1,5 @@
 import logUpdate from "log-update";
-import { withLoadingSpinner, withWaitForSpacebarPressed } from "./output";
+import { withLoadingSpinner, withWaitForSpacebarPressed } from "./output.js";
 
 enum CheckscriptStepType {
   MANUAL,

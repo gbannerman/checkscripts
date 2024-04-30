@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import logUpdate from "log-update";
-import { CheckscriptMode } from "./checkscript";
-import { waitForInput } from "./input";
+import { CheckscriptMode } from "./checkscript.js";
+import { waitForInput } from "./input.js";
 
 const LOADING_FRAMES = ["-", "\\", "|", "/"];
 

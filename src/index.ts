@@ -1,4 +1,4 @@
-import { checkscript, step } from "./lib";
+import { checkscript, step } from "./lib/index.js";
 
 function fakeApiCall(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
