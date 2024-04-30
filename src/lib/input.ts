@@ -15,6 +15,6 @@ export async function waitForInput() {
         console.log("❗️ Exited");
         process.exit();
       }
-    })
+    }),
   );
 }

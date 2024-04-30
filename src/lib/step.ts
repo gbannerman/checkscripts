@@ -14,7 +14,7 @@ export interface CheckscriptStep<Context> {
 
 export function step<Context>(
   name: string,
-  action: CheckscriptStepAction<Context>
+  action: CheckscriptStepAction<Context>,
 ) {
   const type = getStepType(action);
 
@@ -26,7 +26,7 @@ export function step<Context>(
 }
 
 export function getDocumentStepHandler<Context>(
-  action: CheckscriptStepAction<Context>
+  action: CheckscriptStepAction<Context>,
 ) {
   switch (typeof action) {
     case "string":
@@ -43,7 +43,7 @@ export function getDocumentStepHandler<Context>(
 }
 
 export function getRunStepHandler<Context>(
-  action: CheckscriptStepAction<Context>
+  action: CheckscriptStepAction<Context>,
 ) {
   switch (typeof action) {
     case "string":
@@ -69,13 +69,13 @@ function getStepType<Context>(action: CheckscriptStepAction<Context>) {
 }
 
 type AutomatedCheckscriptStepAction<Context> = (
-  context: Context
+  context: Context,
 ) => string | void | Promise<string | void>;
 
 async function automatedStep<Context>(
   context: Context,
   stepTitle: string,
-  action: AutomatedCheckscriptStepAction<Context>
+  action: AutomatedCheckscriptStepAction<Context>,
 ) {
   const text = await withLoadingSpinner(stepTitle, () => action(context));
 
@@ -83,7 +83,7 @@ async function automatedStep<Context>(
     `
 ✓ ${stepTitle}
 ${text ?? ""}
-`
+`,
   );
 
   logUpdate.done();
@@ -93,19 +93,19 @@ type ManualCheckscriptStepAction = string;
 
 async function manualStep(
   stepTitle: string,
-  action: ManualCheckscriptStepAction
+  action: ManualCheckscriptStepAction,
 ) {
   await withWaitForSpacebarPressed(
     `
 ➤ ${stepTitle}
-${action}`
+${action}`,
   );
 
   logUpdate(
     `
 ✓ ${stepTitle}
 ${action}
-    `
+    `,
   );
 
   logUpdate.done();

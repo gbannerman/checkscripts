@@ -21,7 +21,7 @@ export function useFormat(mode: CheckscriptMode) {
         name: (name: string) => {
           const dividerLength = name.length + 6;
           return `${"-".repeat(dividerLength)}\n   ${chalk.bold(
-            name
+            name,
           )}\n${"-".repeat(dividerLength)}`;
         },
         description: (description: string) => `${chalk.italic(description)}\n`,
@@ -33,7 +33,7 @@ export function useFormat(mode: CheckscriptMode) {
 
 export async function withLoadingSpinner<T>(
   text: string,
-  operation: () => Promise<T> | T
+  operation: () => Promise<T> | T,
 ) {
   let index = 0;
   const interval = setInterval(() => {
@@ -41,7 +41,7 @@ export async function withLoadingSpinner<T>(
     logUpdate(
       `
 ${frame} ${text}
-      `
+      `,
     );
   }, 80);
 
@@ -56,7 +56,7 @@ export async function withWaitForSpacebarPressed(text: string) {
   logUpdate(
     `${text}
 ${chalk.dim("PRESS SPACEBAR TO CONTINUE")}
-    `
+    `,
   );
 
   await waitForInput();

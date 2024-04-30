@@ -37,7 +37,7 @@ describe("waitForInput", () => {
       mockExitProcess = jest
         .spyOn(process, "exit")
         .mockImplementationOnce((() => {}) as (
-          code?: number | undefined
+          code?: number | undefined,
         ) => never);
       mockConsoleLog = jest
         .spyOn(console, "log")

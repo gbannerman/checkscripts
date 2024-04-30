@@ -10,7 +10,7 @@ export enum CheckscriptMode {
 export function checkscript<Context extends Object = {}>(
   name: string,
   description: string,
-  context: Context = {} as Context
+  context: Context = {} as Context,
 ) {
   return new Checkscript<Context>(name, description, context);
 }
@@ -48,7 +48,7 @@ class Checkscript<Context extends Object> {
 
   document = async function (
     this: Checkscript<Context>,
-    options: DocumentCheckscriptOptions = { includeFooter: true }
+    options: DocumentCheckscriptOptions = { includeFooter: true },
   ) {
     this._runCheckscript(CheckscriptMode.DOCUMENT, options.includeFooter);
   };
@@ -56,7 +56,7 @@ class Checkscript<Context extends Object> {
   private _runCheckscript = async function (
     this: Checkscript<Context>,
     mode: CheckscriptMode,
-    includeFooter: boolean
+    includeFooter: boolean,
   ) {
     const { name, description, stepTitle, footer } = useFormat(mode);
 
