@@ -8,6 +8,7 @@
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
@@ -16,5 +17,5 @@
     "declarationMap": true
   },
   "files": ["src/lib/index.ts"],
-  "exclude": ["./dist", "jest.config.ts"]
+  "exclude": ["./dist"]
 }
