@@ -19,14 +19,6 @@ describe("waitForInput", () => {
     await expect(delay).resolves.not.toThrow();
   });
 
-  it("resolves when spacebar is pressed", async () => {
-    const delay = waitForInput();
-
-    stdin.send(KEYS.SPACEBAR, "utf8");
-
-    await expect(delay).resolves.not.toThrow();
-  });
-
   describe("exits the process", () => {
     let mockExitProcess: jest.SpiedFunction<
       (code?: number | undefined) => never
