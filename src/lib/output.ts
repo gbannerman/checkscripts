@@ -10,8 +10,8 @@ export function useFormat(mode: CheckscriptMode) {
     ? {
         name: (name: string) => `# ${name}`,
         description: (description: string) => `*${description}*`,
-        stepTitle: (stepNumber: number, name: string) =>
-          `${stepNumber}. ${name}`,
+        stepTitle: (stepNumber: number, name: string | null) =>
+          `${stepNumber}. ${name ?? `Step ${stepNumber}`}`,
         footer: () => `
 ---
 *This document is a [checkscript](https://github.com/gbannerman/checkscripts). It can be run using JavaScript.*
@@ -25,8 +25,8 @@ export function useFormat(mode: CheckscriptMode) {
           )}\n${"-".repeat(dividerLength)}`;
         },
         description: (description: string) => `${chalk.italic(description)}\n`,
-        stepTitle: (stepNumber: number, name: string) =>
-          chalk.bold(`${stepNumber}. ${name}`),
+        stepTitle: (stepNumber: number, name: string | null) =>
+          chalk.bold(`${stepNumber}. ${name ?? `Step ${stepNumber}`}`),
         footer: (name: string) => `\n✅ Complete: ${chalk.bold(name)}`,
       };
 }

@@ -7,19 +7,43 @@ enum CheckscriptStepType {
 }
 
 export interface CheckscriptStep<Context> {
-  name: string;
+  name: string | null;
   type: CheckscriptStepType;
   action: CheckscriptStepAction<Context>;
 }
 
 export function step<Context>(
+  description: TemplateStringsArray,
+): CheckscriptStep<Context>;
+export function step<Context>(
   name: string,
-  action: CheckscriptStepAction<Context>,
-) {
+  action: ManualCheckscriptStepAction,
+): CheckscriptStep<Context>;
+export function step<Context>(
+  name: string,
+  action: AutomatedCheckscriptStepAction<Context>,
+): CheckscriptStep<Context>;
+
+export function step<Context>(
+  initial: string | TemplateStringsArray,
+  ...args:
+    | ManualCheckscriptStepAction[]
+    | AutomatedCheckscriptStepAction<Context>[]
+): CheckscriptStep<Context> {
+  if (typeof initial !== "string") {
+    return {
+      name: null,
+      type: CheckscriptStepType.MANUAL,
+      action: initial[0],
+    };
+  }
+
+  const [action] = args;
+
   const type = getStepType(action);
 
   return {
-    name,
+    name: initial,
     type,
     action,
   };

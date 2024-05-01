@@ -1,4 +1,4 @@
-import { checkscript, step } from "./lib/index.js";
+import { checkscript, step, first, then, next } from "./lib/index.js";
 
 function fakeApiCall(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -15,11 +15,11 @@ checkscript<TestContext>(
   { fakeApiCall, fakeResult: null },
 )
   .steps(
-    step(
+    first(
       "Checkout the git repository",
       "Run git clone git@github.com:administrate/{REPO_NAME}.git in your terminal",
     ),
-    step("Do another thing", "Do this thing"),
+    then`Do this thing`,
     step("Do an automatic thing", async (context) => {
       await context.fakeApiCall(3000);
       context.fakeResult = "Result 1";
@@ -33,10 +33,10 @@ checkscript<TestContext>(
       "Run git clone git@github.com:administrate/{REPO_NAME}.git in your terminal",
     ),
     step("Do another thing", "Do this thing"),
-    step("End thing", "One more"),
+    next`One more`,
     step("Finally", async (context) => {
       await context.fakeApiCall(3000);
       return `From previous step: ${context.fakeResult}`;
     }),
   )
-  .document();
+  .run();
