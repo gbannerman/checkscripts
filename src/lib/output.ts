@@ -14,7 +14,7 @@ export function useFormat(mode: CheckscriptMode) {
           `${stepNumber}. ${name}`,
         footer: () => `
 ---
-*This document is a [checkscript](). It can be run using JavaScript.*
+*This document is a [checkscript](https://github.com/gbannerman/checkscripts). It can be run using JavaScript.*
             `,
       }
     : {
