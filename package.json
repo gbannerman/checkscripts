@@ -1,6 +1,6 @@
 {
   "name": "checkscripts",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Inspired by Dan Slimmon's concept of \"Do Nothing scripts\", this project facilitates incremental automation of repetitive tasks.",
   "type": "module",
   "main": "index.js",
